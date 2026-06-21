@@ -33,7 +33,7 @@ It does two things:
 
 > **Demo (out of the box, no hardware needed):**
 > `stackchan-hermes run token_usage --dry-run` →
-> the robot would set a `happy` face and say *"You've used 1.2 million tokens
+> the robot would set an `idle` face and say *"You've used 1.2 million tokens
 > today. That's 62% of your budget."*
 
 It is built **on top of** the excellent community gateway
@@ -106,8 +106,8 @@ and the transport rationale.
 
 ```bash
 # 1) Clone + install (editable) into an isolated venv
-git clone https://github.com/sameersontakey/stackchan-hermes
-cd stackchan-hermes
+git clone https://github.com/sontakey/Hermes-stackchan
+cd Hermes-stackchan
 uv venv
 uv pip install -e .
 
