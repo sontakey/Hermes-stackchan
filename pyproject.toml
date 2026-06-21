@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "stackchan-hermes"
+version = "0.1.0"
+description = "Drive an M5Stack StackChan robot from Hermes — speech, expressions, head motion, and pluggable display apps."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Sameer Sontakey" }]
+keywords = ["stackchan", "m5stack", "esp32", "robot", "mcp", "hermes", "tts"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Home Automation",
+]
+dependencies = [
+    # Official MCP SDK — used for the stdio client that talks to the
+    # stackchan-mcp gateway. Optional at runtime for --dry-run mode.
+    "mcp>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.6", "pytest>=8.0"]
+
+[project.scripts]
+stackchan-hermes = "stackchan_hermes.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/sameersontakey/stackchan-hermes"
+"Upstream gateway" = "https://github.com/kisaragi-mochi/stackchan-mcp"
+"Original stack-chan" = "https://github.com/stack-chan/stack-chan"
+
+[tool.hatch.build.targets.wheel]
+packages = ["stackchan_hermes"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"

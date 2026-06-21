@@ -1,0 +1,9 @@
+{
+  "window": "today",
+  "tasks": [
+    { "title": "Shipped the StackChan bridge", "status": "done" },
+    { "title": "Reviewed the firmware PR", "status": "done" },
+    { "title": "Wrote the README", "status": "done" },
+    { "title": "Drafting the roadmap", "status": "in_progress" }
+  ]
+}

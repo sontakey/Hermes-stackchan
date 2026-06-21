@@ -1,0 +1,25 @@
+# Hermes MCP config snippet for the stackchan-mcp gateway.
+#
+# Add this block to ~/.hermes/config.yaml (top level). Hermes spawns the
+# gateway as a stdio MCP server at startup and registers its tools as
+# mcp_stackchan_<tool> (e.g. mcp_stackchan_say, mcp_stackchan_move_head).
+#
+# Note: stackchan-hermes' OWN apps talk to the gateway directly over stdio
+# (see stackchan_hermes/client.py); this block is for letting the Hermes
+# AGENT itself call the robot's tools in conversation. Both can coexist as
+# long as only one owner runs the gateway at a time (see README).
+
+mcp_servers:
+  stackchan:
+    # Point at the gateway's console script (zero subcommand = stdio MCP server).
+    command: "/Users/anton/stackchan-mcp/.venv/bin/stackchan-mcp"
+    args: []
+    env:
+      # MUST match the device's Gateway Token (set in the Wi-Fi config UI).
+      STACKCHAN_TOKEN: "stackchan-dev-token"
+      # This Mac's LAN IP, so take_photo callbacks reach the gateway.
+      VISION_HOST: "192.168.4.30"
+      # STACKCHAN_VOICEVOX_URL: "http://127.0.0.1:50021"  # default; override if needed
+    enabled: true
+    timeout: 120
+    connect_timeout: 60
