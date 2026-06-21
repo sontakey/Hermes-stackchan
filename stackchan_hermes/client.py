@@ -50,22 +50,24 @@ class StackchanLike(Protocol):
 class GatewayConfig:
     """How to launch / reach the stackchan-mcp gateway over stdio.
 
-    Defaults match the verified local install. ``command`` should point at the
-    gateway's ``stackchan-mcp`` console script (zero subcommand = stdio server).
+    Defaults match a standard install. ``command`` should point at the
+    gateway's ``stackchan-mcp`` console script (zero subcommand = stdio server);
+    by default we look it up on PATH, overridable via ``STACKCHAN_GATEWAY_CMD``.
     """
 
     command: str = os.environ.get(
         "STACKCHAN_GATEWAY_CMD",
-        "/Users/anton/stackchan-mcp/.venv/bin/stackchan-mcp",
+        "stackchan-mcp",
     )
     args: tuple[str, ...] = ()
     env: Optional[dict[str, str]] = None
 
     def merged_env(self) -> dict[str, str]:
         env = dict(os.environ)
-        # Token + vision host the gateway needs; overridable from the real env.
+        # Token the gateway needs; supplied from the real env (must match the
+        # device's Gateway Token). Defaults to empty when unset.
         env.setdefault("STACKCHAN_TOKEN",
-                       os.environ.get("STACKCHAN_TOKEN", "stackchan-dev-token"))
+                       os.environ.get("STACKCHAN_TOKEN", ""))
         if self.env:
             env.update(self.env)
         return env

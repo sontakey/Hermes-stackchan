@@ -12,13 +12,14 @@
 mcp_servers:
   stackchan:
     # Point at the gateway's console script (zero subcommand = stdio MCP server).
-    command: "/Users/anton/stackchan-mcp/.venv/bin/stackchan-mcp"
+    command: "/path/to/stackchan-mcp/.venv/bin/stackchan-mcp"
     args: []
     env:
       # MUST match the device's Gateway Token (set in the Wi-Fi config UI).
-      STACKCHAN_TOKEN: "stackchan-dev-token"
+      STACKCHAN_TOKEN: "<YOUR_TOKEN>"
       # This Mac's LAN IP, so take_photo callbacks reach the gateway.
-      VISION_HOST: "192.168.4.30"
+      # Find it with: ipconfig getifaddr en0
+      VISION_HOST: "<YOUR_MAC_LAN_IP>"
       # STACKCHAN_VOICEVOX_URL: "http://127.0.0.1:50021"  # default; override if needed
     enabled: true
     timeout: 120
