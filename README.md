@@ -97,8 +97,42 @@ and the transport rationale.
   `docker run --rm -p 127.0.0.1:50021:50021 voicevox/voicevox_engine:cpu-ubuntu20.04-latest`.
   Every non-audio tool (face, head, photo) works without it.
 
-> First-time flashing & wiring is documented upstream; this repo assumes the
-> gateway is already runnable.
+> Never flashed a StackChan before? The full walkthrough lives right here in the
+> repo — see **[🔌 Flash your StackChan](#-flash-your-stackchan)** below and
+> [docs/SETUP.md](docs/SETUP.md). No need to leave for upstream docs.
+
+---
+
+## 🔌 Flash your StackChan
+
+Got a fresh K151 / CoreS3? Four steps get the community firmware on it. Use a
+USB-C **data** cable (not charge-only), then **hold RST ~3 s** to enter download
+mode.
+
+```bash
+# 1) Find the serial port (note the exact name, e.g. /dev/cu.usbmodem1101)
+ls /dev/cu.usbmodem*
+
+# 2) Download the latest prebuilt merged firmware
+curl -L -o merged-binary.bin \
+  https://github.com/kisaragi-mochi/stackchan-mcp/releases/latest/download/merged-binary.bin
+
+# 3) Flash the full image to 0x0 (replace the port with yours)
+esptool --chip esp32s3 --port /dev/cu.usbmodem1101 -b 460800 \
+  write_flash 0x0 merged-binary.bin
+
+# 4) Find your computer's LAN IP — you'll point the device at it next
+ipconfig getifaddr en0
+```
+
+On first boot the device starts a Wi-Fi setup AP: join it, open the captive
+portal at `http://192.168.4.1`, configure Wi-Fi, then on the **Advanced** tab set
+**WebSocket Gateway URL** → `ws://<YOUR_MAC_LAN_IP>:8765/` and a **Gateway
+Token** of your choice — it just has to match `STACKCHAN_TOKEN` on the gateway.
+
+> 📖 **[See docs/SETUP.md](docs/SETUP.md) for the full walkthrough & troubleshooting** —
+> including the esptool 5.x note, optional VOICEVOX speech, and what to do if you
+> previously flashed the wrong fork (`migratorywhale/stackchan-mcp`).
 
 ---
 
@@ -127,7 +161,7 @@ The full flash → gateway → wire → run flow:
 
 | Step | What | Where |
 |---|---|---|
-| 1 | Flash firmware to the CoreS3 | upstream `stackchan-mcp` README |
+| 1 | Flash firmware to the CoreS3 | [docs/SETUP.md](docs/SETUP.md) |
 | 2 | Run / install the gateway (stdio MCP server) | upstream `stackchan-mcp` |
 | 3 | (Optional) Wire the gateway into the **Hermes agent** | [below](#-how-hermes-connects) |
 | 4 | Run a display app | `stackchan-hermes run <app>` |
@@ -143,11 +177,11 @@ in conversation, add the gateway to `~/.hermes/config.yaml`
 ```yaml
 mcp_servers:
   stackchan:
-    command: "/Users/anton/stackchan-mcp/.venv/bin/stackchan-mcp"  # zero subcommand = stdio MCP server
+    command: "/path/to/stackchan-mcp/.venv/bin/stackchan-mcp"  # zero subcommand = stdio MCP server
     args: []
     env:
-      STACKCHAN_TOKEN: "stackchan-dev-token"   # MUST match the device's Gateway Token
-      VISION_HOST: "192.168.4.30"              # this host's LAN IP (for take_photo)
+      STACKCHAN_TOKEN: "<YOUR_TOKEN>"          # MUST match the device's Gateway Token
+      VISION_HOST: "<YOUR_MAC_LAN_IP>"         # this host's LAN IP (for take_photo)
     enabled: true
     timeout: 120
     connect_timeout: 60
