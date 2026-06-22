@@ -15,11 +15,23 @@ mcp_servers:
     command: "/path/to/stackchan-mcp/.venv/bin/stackchan-mcp"
     args: []
     env:
-      # MUST match the device's Gateway Token (set in the Wi-Fi config UI).
-      STACKCHAN_TOKEN: "<YOUR_TOKEN>"
-      # This Mac's LAN IP, so take_photo callbacks reach the gateway.
+      # This host's LAN IP, so take_photo callbacks reach the gateway.
       # Find it with: ipconfig getifaddr en0
       VISION_HOST: "<YOUR_MAC_LAN_IP>"
+      #
+      # --- Gateway Token (OPTIONAL) ---------------------------------------
+      # ONLY set this if the device has a Gateway Token. If the device has NO
+      # token (common), setting STACKCHAN_TOKEN here makes the gateway REJECT
+      # the device. Leave it commented for a token-less device, or set the
+      # SAME value on both sides.
+      # STACKCHAN_TOKEN: "<YOUR_TOKEN>"          # MUST match the device's token
+      #
+      # --- Non-default ports (OPTIONAL) -----------------------------------
+      # Only if 8765/8766 are taken on this host. If you set WS_PORT, the
+      # device's NVS websocket.url MUST use the same port (ws://host:8865/).
+      # WS_PORT: "8865"
+      # CAPTURE_PORT: "8866"
+      #
       # STACKCHAN_VOICEVOX_URL: "http://127.0.0.1:50021"  # default; override if needed
     enabled: true
     timeout: 120
