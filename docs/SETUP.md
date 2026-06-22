@@ -124,10 +124,25 @@ Then, on the captive portal (`http://192.168.4.1`), open the **Advanced** tab an
 
 Save → the device reboots and dials your gateway.
 
-> **Tip:** the gateway also advertises mDNS (`_stackchan-mcp._tcp.local.`), so
-> leaving the URL blank lets the firmware auto-discover the gateway on the LAN.
-> The token must still be set manually. A hardcoded URL is the reliable path;
-> mDNS is the convenience path.
+> **Important — set the URL explicitly; don't rely on mDNS.** The firmware *can*
+> discover the gateway over mDNS (`_stackchan-mcp._tcp.local.`), but in practice
+> you should **always fill in the WebSocket Gateway URL above**:
+> - the **prebuilt release binary usually ships with mDNS discovery *not*
+>   compiled in** — confirm on a connected device with the `gateway_config.get`
+>   tool, which returns `discovery_compiled_in: false`; when it's false, mDNS
+>   will *never* work, regardless of network; and
+> - even when it is compiled in, many Wi-Fi networks (large multi-AP / guest /
+>   enterprise) block mDNS multicast between clients.
+>
+> If you leave the URL blank you'll most likely see the device loop on
+> `WS: WS_URL not configured: no websocket gateway URL candidates available`.
+
+> **Already flashed and just need to repoint it?** You don't have to re-run the
+> captive portal. While the device is connected to *any* gateway you control,
+> call the `gateway_config.set` tool with
+> `url: "ws://<NEW_HOST_IP>:<WS_PORT>/"` — it persists to NVS and takes effect on
+> the next reconnect. (For a fully headless set, you can also write the NVS
+> partition directly; see the upstream firmware docs.)
 
 ---
 
@@ -181,7 +196,11 @@ speaker (no firmware change needed for audio).
 
 | Symptom | Fix |
 |---|---|
-| **Port `8765` already in use** | Something else is bound to the gateway port. Find it with `lsof -i :8765`, confirm what it is, then free the port (stop or kill that process) so the gateway can bind. |
+| **Device loops on `no websocket gateway URL candidates available`** | The device has no gateway URL and mDNS isn't resolving (usually not compiled into the prebuilt firmware). Set the **WebSocket Gateway URL** explicitly — via the captive portal (step 6) or the `gateway_config.set` tool. This is the #1 "won't connect" cause. |
+| **Port `8765` (or `8766`) already in use** | Another service owns the port. Either free it (`lsof -i :8765`, then stop that process), **or** run the gateway on a different port: set `WS_PORT` (and `CAPTURE_PORT`) in the env — then the device's WebSocket URL **must** use the same `WS_PORT` (e.g. `ws://<host>:8865/`). |
+| **Device connects then drops / `hermes mcp test` says "Connection closed"** | Two gateways are fighting for the device (ownership lock + WS port). Only **one owner at a time** — don't run a standalone gateway while Hermes spawns its own, or point two hosts at the same device. |
+| **`take_photo` times out / returns nothing** | `VISION_HOST` is unset or wrong. Set it to the gateway host's LAN IP (and `CAPTURE_PORT` if you changed it) so the device can reach the capture endpoint. |
+| **Gateway rejects the device / device won't authenticate** | Token mismatch. If the device has **no** Gateway Token, leave `STACKCHAN_TOKEN` unset on the gateway too — setting it there rejects a token-less device. Otherwise set the **same** value on both sides. |
 | **No `/dev/cu.usbmodem*` device appears** | Re-seat the USB-C cable (or try a different, known-**data** cable / port), then redo the **RST hold ~3 s** to re-enter download mode and check `ls /dev/cu.usbmodem*` again. |
 | **`say` fails / no audio** | VOICEVOX isn't running. Start the engine (step 8) and retry. Non-audio tools are unaffected. |
 | **You flashed `migratorywhale/stackchan-mcp` by mistake** | Just re-flash from step 1. `esptool write_flash 0x0` overwrites everything — nothing to uninstall. |

@@ -180,8 +180,9 @@ mcp_servers:
     command: "/path/to/stackchan-mcp/.venv/bin/stackchan-mcp"  # zero subcommand = stdio MCP server
     args: []
     env:
-      STACKCHAN_TOKEN: "<YOUR_TOKEN>"          # MUST match the device's Gateway Token
       VISION_HOST: "<YOUR_MAC_LAN_IP>"         # this host's LAN IP (for take_photo)
+      # STACKCHAN_TOKEN: "<YOUR_TOKEN>"        # ONLY if the device has a token — else it gets REJECTED
+      # WS_PORT: "8865"                        # ONLY if 8765 is taken; device URL must match this port
     enabled: true
     timeout: 120
     connect_timeout: 60
@@ -189,7 +190,10 @@ mcp_servers:
 
 Hermes registers the tools as `mcp_stackchan_say`, `mcp_stackchan_set_avatar`,
 `mcp_stackchan_move_head`, `mcp_stackchan_take_photo`, … Restart Hermes (MCP
-servers are discovered at startup).
+servers are discovered at startup), then verify with `hermes mcp list`
+(should show `stackchan ✓ enabled`). The token/port lines are commented for a
+reason — getting them wrong silently rejects the device; see
+[docs/SETUP.md](docs/SETUP.md#troubleshooting).
 
 > **One owner at a time.** The gateway owns the single WebSocket to the device.
 > Don't run a standalone gateway *and* let Hermes spawn one *and* run our client
